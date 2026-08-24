@@ -209,6 +209,23 @@ button:disabled {
   font-size: 15px;
 }
 
+.output-loading {
+  color: var(--muted);
+  border-left-color: var(--blue);
+  background: #f3f8fb;
+}
+
+.output-loading::after {
+  content: "▍";
+  animation: blink 1s step-start infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
 /* ---- 结果区：徽标 / 轨迹 / 来源 ---- */
 .result {
   display: flex;

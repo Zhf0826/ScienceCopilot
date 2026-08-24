@@ -1,14 +1,42 @@
-async function postJson(url, payload) {
+// 以 SSE 流式调用 Agent 接口，边生成边接收事件，避免云平台长请求超时。
+async function streamAgent(url, payload, handlers) {
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  const data = await response.json();
   if (!response.ok) {
-    throw new Error(data.error || "请求失败");
+    const text = await response.text();
+    handlers.onError(new Error(text || `HTTP ${response.status}`));
+    return;
   }
-  return data;
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    let idx;
+    while ((idx = buffer.indexOf("\n\n")) >= 0) {
+      const raw = buffer.slice(0, idx);
+      buffer = buffer.slice(idx + 2);
+      if (raw.startsWith(":")) continue; // SSE 心跳注释，忽略
+      const dataLine = raw
+        .split("\n")
+        .find((line) => line.startsWith("data: "));
+      if (!dataLine) continue;
+      let evt;
+      try {
+        evt = JSON.parse(dataLine.slice(6));
+      } catch {
+        continue;
+      }
+      if (evt.type === "start") handlers.onStart && handlers.onStart();
+      else if (evt.type === "done") handlers.onDone && handlers.onDone(evt);
+      else if (evt.type === "error") handlers.onError && handlers.onError(new Error(evt.error));
+    }
+  }
 }
 
 function setLoading(button, message) {
@@ -94,7 +122,9 @@ function renderResult(container, data) {
       item.className = "source-item";
       const head = document.createElement("div");
       head.className = "source-head";
-      head.textContent = `${src.topic} · 适用年级 ${src.grades.join("/")} · 命中关键词：${src.matched_keywords.join("、") || "—"}`;
+      head.textContent = `${src.topic} · 适用年级 ${src.grades.join(
+        "/"
+      )} · 命中关键词：${src.matched_keywords.join("、") || "—"}`;
       const body = document.createElement("div");
       body.className = "source-body";
       body.textContent = src.content;
@@ -119,17 +149,25 @@ const auditResult = document.querySelector("#auditResult");
 
 generateBtn.addEventListener("click", async () => {
   setLoading(generateBtn, "Agent 正在规划与检索…");
+  inquiryResult.innerHTML =
+    '<pre class="output output-loading">生成中，请稍候（首次调用可能需数十秒）…</pre>';
   try {
-    const data = await postJson("/api/inquiry", {
-      grade: document.querySelector("#grade").value,
-      topic: document.querySelector("#topic").value,
-      goal: document.querySelector("#goal").value,
-      duration: document.querySelector("#duration").value,
-      materials: document.querySelector("#materials").value,
-    });
-    renderResult(inquiryResult, data);
-  } catch (error) {
-    inquiryResult.innerHTML = `<pre class="output">生成失败：${error.message}</pre>`;
+    await streamAgent(
+      "/api/inquiry",
+      {
+        grade: document.querySelector("#grade").value,
+        topic: document.querySelector("#topic").value,
+        goal: document.querySelector("#goal").value,
+        duration: document.querySelector("#duration").value,
+        materials: document.querySelector("#materials").value,
+      },
+      {
+        onDone: (data) => renderResult(inquiryResult, data),
+        onError: (e) => {
+          inquiryResult.innerHTML = `<pre class="output">生成失败：${e.message}</pre>`;
+        },
+      }
+    );
   } finally {
     clearLoading(generateBtn, "生成探究方案");
   }
@@ -137,13 +175,21 @@ generateBtn.addEventListener("click", async () => {
 
 auditBtn.addEventListener("click", async () => {
   setLoading(auditBtn, "Agent 正在检索与审核…");
+  auditResult.innerHTML =
+    '<pre class="output output-loading">生成中，请稍候（首次调用可能需数十秒）…</pre>';
   try {
-    const data = await postJson("/api/audit", {
-      content: document.querySelector("#auditText").value,
-    });
-    renderResult(auditResult, data);
-  } catch (error) {
-    auditResult.innerHTML = `<pre class="output">审核失败：${error.message}</pre>`;
+    await streamAgent(
+      "/api/audit",
+      {
+        content: document.querySelector("#auditText").value,
+      },
+      {
+        onDone: (data) => renderResult(auditResult, data),
+        onError: (e) => {
+          auditResult.innerHTML = `<pre class="output">审核失败：${e.message}</pre>`;
+        },
+      }
+    );
   } finally {
     clearLoading(auditBtn, "审核科学内容");
   }
