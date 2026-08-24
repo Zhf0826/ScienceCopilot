@@ -1,0 +1,8 @@
+# ScienceCopilot 运行时零第三方依赖，仅使用 Python 标准库。
+#
+# 保留此文件仅为满足云平台（Render / Railway / Docker / Fly 等）的 Python
+# 构建约定。构建阶段 `pip install -r requirements.txt` 不会安装任何包。
+#
+# 若未来引入第三方库，在此按行添加，例如：
+#   requests>=2.31.0
+#   openai>=1.0.0

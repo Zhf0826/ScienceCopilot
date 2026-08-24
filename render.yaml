@@ -1,0 +1,26 @@
+# Render 一键部署配置（免费 Web Service）
+#
+# 用法：在 GitHub 仓库关联 Render 后，Render 会读取本文件自动完成部署。
+# 生成的公网地址形如：https://sciencecopilot.onrender.com
+#
+# 说明：
+# - 项目零依赖，构建阶段无需安装任何包。
+# - 不配置 API Key 时，应用自动进入「演示模式」，任何访客无需安装即可使用。
+# - PORT / HOST 由 config.py 读取：云平台注入 PORT，HOST 默认 0.0.0.0。
+services:
+  - type: web
+    name: sciencecopilot
+    runtime: python
+    plan: free
+    region: oregon            # 可选：oregon / frankfurt / singapore
+    buildCommand: "echo 'no build step (zero dependencies)'"
+    startCommand: "python app.py"
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: HOST
+        value: 0.0.0.0
+    # 可选：填入真实密钥后由模型生成，否则保持演示模式。
+    # - key: DEEPSEEK_API_KEY
+    #   sync: false
