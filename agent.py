@@ -55,8 +55,9 @@ def _run_real(system: str, user: str, query: str, text: str) -> dict:
     retrieved = rag.retrieve(query)
     safety = rag.check_safety(text)
 
+    offered_tools = tools.TOOL_SCHEMAS
     for _ in range(config.AGENT_MAX_ITERATIONS):
-        resp = llm.chat(messages, tools=tools.TOOL_SCHEMAS)
+        resp = llm.chat(messages, tools=offered_tools)
 
         if resp.get("tool_calls"):
             if resp.get("content"):
@@ -94,6 +95,7 @@ def _run_real(system: str, user: str, query: str, text: str) -> dict:
                         "content": obs,
                     }
                 )
+            offered_tools = None  # 已使用工具，后续不再提供，迫使模型直接综合作答
             continue
 
         result = resp["content"]
