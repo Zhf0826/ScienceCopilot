@@ -38,7 +38,7 @@ Agent 编排器 (Planner + ReAct 循环)
 结构化结果 (trace + retrieved + safety + result)
 ```
 
-> 演示模式（无 API Key）下，Agent 走确定性分支，但 **RAG 检索与安全检查仍是真实调用**，
+> 演示模式（无 API Key）下，Agent 走确定性分支，但 RAG 检索与安全检查仍是真实调用，
 > 仅"最终作答"用模板合成，保证离线也能完整演示 Agent + RAG 流程。
 
 ---
@@ -80,11 +80,11 @@ python app.py
 可选配置
 
 ```powershell
-$env:OPENAI_MODEL="deepseek-chat"      # 模型名
-$env:OPENAI_BASE_URL="https://..."     # 兼容 OpenAI 的接口地址
-$env:PORT="8000"                       # 端口
-$env:AGENT_MAX_ITERATIONS="6"          # Agent 最大工具循环次数
-$env:RAG_TOP_K="4"                     # RAG 返回片段数
+$env:OPENAI_MODEL="deepseek-chat"       模型名
+$env:OPENAI_BASE_URL="https://..."      兼容 OpenAI 的接口地址
+$env:PORT="8000"                        端口
+$env:AGENT_MAX_ITERATIONS="6"           Agent 最大工具循环次数
+$env:RAG_TOP_K="4"                      RAG 返回片段数
 ```
 
 ---
