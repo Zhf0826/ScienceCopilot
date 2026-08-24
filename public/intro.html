@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ScienceCopilot · 项目介绍</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>ScienceCopilot</h1>
+        <p>小学科学教师智能助手 · <span class="tag">LLM · Prompt · Agent · RAG</span></p>
+      </div>
+      <div class="topbar-right">
+        <a class="intro-link" href="/index.html">← 返回应用</a>
+      </div>
+    </header>
+
+    <article class="intro">
+      <p class="lead">
+        ScienceCopilot 把"小学科学备课"这件重复性高、专业门槛不低的工作，
+        交给一个会规划、会查课标、能评估实验安全的 AI Agent。它不是一个只会
+        补全文本的聊天框，而是一个由 <strong>LLM + Prompt Engineering + Agent 工作流
+        + 知识库 RAG</strong> 共同驱动的备课协作者。
+      </p>
+
+      <h2>我们要解决什么问题</h2>
+      <p>
+        小学科学教师（尤其非理科背景或新教师）在备课时常面临三件事：① 不确定
+        某个知识点在课标中的准确表述与年级对应；② 容易踩中学生的"直觉误区"；
+        ③ 设计动手实验时缺乏系统性的安全评估。ScienceCopilot 用 AI 把这三件事
+        前置到生成与审核环节自动完成。
+      </p>
+
+      <h2>AI 能力的四层设计</h2>
+      <div class="card-grid">
+        <div class="card">
+          <h3>LLM</h3>
+          <p>OpenAI 兼容接口，默认 DeepSeek；负责最终的自然语言生成与推理。</p>
+        </div>
+        <div class="card">
+          <h3>Prompt Engineering</h3>
+          <p>角色设定 + 约束 + 固定【栏目】输出格式，保证结果结构化、可解析。</p>
+        </div>
+        <div class="card">
+          <h3>Agent 工作流</h3>
+          <p>ReAct 风格循环：规划 → 调用工具 → 观察 → 反思 → 产出，而非一次补全。</p>
+        </div>
+        <div class="card">
+          <h3>知识库 RAG</h3>
+          <p>检索课标核心概念与常见误区，让生成"有据可依"，并透明展示来源。</p>
+        </div>
+      </div>
+
+      <h2>Agent 是怎么工作的</h2>
+      <p>
+        当用户提交需求后，编排器（Agent）并不会立刻"凭空写答案"，而是先规划：
+        需要核对课标概念吗？涉及动手操作要评估安全吗？随后它调用两个工具——
+        <code>retrieve_curriculum</code>（RAG 检索）与 <code>check_safety</code>（安全检查），
+        把工具返回的证据（observation）纳入推理，最后才产出符合格式的方案或审核结论。
+        每一步"思考 / 调用工具 / 观察"都会在前端以<strong>推理轨迹</strong>呈现，用户可以
+        清楚看到 Agent 为什么这样回答。
+      </p>
+
+      <h2>知识库 RAG 是怎么工作的</h2>
+      <p>
+        知识库 <code>kb/curriculum.json</code> 收录了小学 3-6 年级核心科学概念、常见误区与
+        年级对应；<code>kb/safety.json</code> 收录实验安全红线规则。检索采用<strong>关键词 + 年级
+        匹配</strong>的稀疏检索——这样做的好处是：无需 embedding 服务即可完全离线运行，
+        且检索结果对用户完全透明、可追溯。前端"RAG 检索来源"区块会列出命中的主题、
+        适用年级与命中关键词。后续可无缝替换为向量检索，对外接口不变。
+      </p>
+
+      <h2>技术栈与工程取舍</h2>
+      <ul>
+        <li><strong>零依赖</strong>：仅用 Python 标准库，<code>python app.py</code> 即可启动。</li>
+        <li><strong>离线可演示</strong>：未配置 API Key 时进入演示模式，RAG 与安全工具仍为真实调用。</li>
+        <li><strong>模块化</strong>：<code>config / llm / rag / tools / agent / prompts / app</code> 职责分离。</li>
+        <li><strong>可观测</strong>：统一返回 <code>{trace, retrieved, safety, result, demo}</code>，便于调试与评测。</li>
+      </ul>
+
+      <h2>快速开始</h2>
+      <p>
+        直接运行（演示模式，离线可用）：<code>python app.py</code> 后打开
+        <code>http://127.0.0.1:8000</code>。<br />
+        接入真实模型（DeepSeek）：<code>$env:DEEPSEEK_API_KEY="你的 Key"</code> 后再运行。
+      </p>
+
+      <h2>面试讲解要点</h2>
+      <ul>
+        <li>"为什么是 Agent 而不是单次补全？"——因为备课需要查证与多步推理。</li>
+        <li>"RAG 为什么用稀疏检索？"——离线、透明、零依赖，且接口可平滑升级到向量。</li>
+        <li>"演示模式有何意义？"——让评审无需密钥即可完整体验系统，降低上手门槛。</li>
+        <li>"如何保证质量？"——固定输出格式 + 工具证据 + 可扩展的 LLM-as-judge 评测。</li>
+      </ul>
+
+      <h2>路线规划</h2>
+      <p>
+        MVP 加固 → 单 Agent（规划 + 工具 + 反思）→ 多 Agent 协作（设计/审核/安全三 Agent）
+        + 向量 RAG + 记忆层 → 评测集与 Trace 面板 + 一键部署。
+      </p>
+
+      <a class="back" href="/index.html">← 回到应用，亲自试一试</a>
+    </article>
+  </body>
+</html>
