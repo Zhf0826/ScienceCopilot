@@ -35,9 +35,9 @@ ScienceCopilot 帮助小学 3-6 年级科学教师完成两件高频工作：**�
 
 ---
 
-## AI 架构（四层）
+ AI 架构（四层）
 
-1. **LLM** — OpenAI 兼容接口（默认 DeepSeek / 可切 OpenAI），负责生成与推理。
+1. LLM** — OpenAI 兼容接口（默认 DeepSeek / 可切 OpenAI），负责生成与推理。
 2. **Prompt Engineering** — 角色 + 约束 + 固定【栏目】输出格式，结果可解析、可评测。
 3. **Agent 工作流** — ReAct 风格循环：规划 → 调用工具 → 观察 → 反思 → 产出。
 4. **知识库 RAG** — 检索课标核心概念与常见误区，让生成"有据可依"。
@@ -53,14 +53,14 @@ Agent 编排器 (Planner + ReAct 循环)
 结构化结果 (trace + retrieved + safety + result)
 ```
 
-> 演示模式（无 API Key）下，Agent 走确定性分支，但 **RAG 检索与安全检查仍是真实调用**，
+> 演示模式（无 API Key）下，Agent 走确定性分支，但 RAG 检索与安全检查仍是真实调用，
 > 仅"最终作答"用模板合成，保证离线也能完整演示 Agent + RAG 流程。
 
 ---
 
-## 运行
+运行
 
-### 方式一：直接运行（演示模式，离线可用）
+ 方式一：直接运行（演示模式，离线可用）
 
 ```powershell
 python app.py
@@ -68,7 +68,7 @@ python app.py
 
 打开 http://127.0.0.1:8000 。无需任何 API Key，页面可完整演示交互与检索过程。
 
-### 方式二：接入 DeepSeek（真实模型 + 工具调用）
+ 方式二：接入 DeepSeek（真实模型 + 工具调用）
 
 ```powershell
 $env:DEEPSEEK_API_KEY="你的 DeepSeek API Key"
@@ -84,7 +84,7 @@ OPENAI_MODEL=deepseek-chat
 
 DeepSeek 请求默认关闭思考模式，适合快速生成与审核场景。
 
-### 方式三：使用 OpenAI
+ 方式三：使用 OpenAI
 
 ```powershell
 $env:OPENAI_API_KEY="你的 OpenAI API Key"
@@ -92,7 +92,7 @@ $env:OPENAI_MODEL="gpt-4.1-mini"
 python app.py
 ```
 
-### 可选配置
+ 可选配置
 
 ```powershell
 $env:OPENAI_MODEL="deepseek-chat"      # 模型名
@@ -104,7 +104,7 @@ $env:RAG_TOP_K="4"                     # RAG 返回片段数
 
 ---
 
-## 项目结构
+ 项目结构
 
 ```text
 ScienceCopilot
@@ -129,7 +129,7 @@ ScienceCopilot
 
 ---
 
-## API
+ API
 
 所有接口返回统一结构：
 
@@ -154,7 +154,7 @@ ScienceCopilot
 
 ---
 
-## 测试
+测试
 
 ```powershell
 python -m unittest discover -s tests
@@ -162,14 +162,7 @@ python -m unittest discover -s tests
 
 覆盖 RAG 检索、安全检查、工具执行与 Agent 演示分支。
 
----
-
-## 面试讲解要点
-
-- **为什么是 Agent 而不是单次补全？** 备课需要查证课标与评估安全，是多步推理。
-- **RAG 为什么用稀疏检索？** 离线、透明、零依赖；接口可平滑升级到向量检索。
-- **演示模式的意义？** 评审无需密钥即可完整体验系统，降低上手门槛。
-- **如何保证质量？** 固定输出格式 + 工具证据 + 可扩展的 LLM-as-judge 评测。
+--
 
 ---
 
