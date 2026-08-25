@@ -75,6 +75,9 @@ def retrieve(query: str, top_k: int = 4) -> list[dict]:
             "id": entry["id"],
             "topic": entry["topic"],
             "grades": entry["grades"],
+            "core_concept": entry.get("core_concept", ""),
+            "standard_ref": entry.get("standard_ref", ""),
+            "crosscutting": entry.get("crosscutting", ""),
             "content": entry["summary"],
             "misconceptions": entry.get("common_misconceptions", []),
             "matched_keywords": matched,
@@ -113,6 +116,7 @@ def check_safety(text: str) -> list[dict]:
             "level": rule["level"],
             "label": rule["label"],
             "advice": rule["advice"],
+            "substitute": rule.get("substitute", ""),
         }
         for _, rule in hits
     ]

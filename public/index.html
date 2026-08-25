@@ -3,78 +3,155 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ScienceCopilot AI</title>
+    <title>ScienceCopilot — AI科学课程研发助手</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
-  <body>
-    <header class="topbar">
-      <div>
-        <h1>ScienceCopilot AI</h1>
-        <p>小学科学教师智能助手 · <span class="tag">LLM · Prompt · Agent · RAG</span></p>
+  <body class="teacher-page">
+    <!-- 顶部导航 -->
+    <nav class="teacher-nav">
+      <div class="nav-inner">
+        <a href="/" class="logo">
+          <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="12" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+            <circle cx="14" cy="14" r="6" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+            <circle cx="14" cy="14" r="2" fill="currentColor"/>
+          </svg>
+          <span>ScienceCopilot</span>
+        </a>
+        <div class="nav-links">
+          <a href="#features" class="nav-link">功能</a>
+          <a href="#quickstart" class="nav-link">快速开始</a>
+          <a href="/app.html" class="nav-link">工作台</a>
+          <a href="/intro.html" class="nav-link">项目介绍</a>
+        </div>
+        <a href="/app.html" class="btn-start">进入工作台</a>
       </div>
-      <div class="topbar-right">
-        <span class="status" id="engineStatus">引擎加载中…</span>
-        <a class="intro-link" href="/intro.html">项目介绍 →</a>
+    </nav>
+
+    <!-- 欢迎区域 -->
+    <section class="welcome-section" id="quickstart">
+      <div class="welcome-inner">
+        <div class="welcome-badge">测试版 · 面向科学教师</div>
+        <h1>ScienceCopilot</h1>
+        <p class="welcome-sub">AI 科学课程研发助手</p>
+        <p class="welcome-desc">
+          帮助科学教师快速设计探究活动、优化教学方案、生成评价资源。<br/>
+          基于课程标准和科学知识库增强，生成结果可直接用于课堂教学。
+        </p>
+
+        <!-- 快速开始入口 -->
+        <div class="quickstart-box">
+          <h3>快速开始</h3>
+          <p>输入年级、主题和教学目标，立即生成探究活动方案</p>
+          <form class="quickstart-form" id="quickstartForm">
+            <div class="form-row">
+              <input type="text" id="qs-grade" placeholder="年级（如：四年级）" value="四年级" />
+              <input type="text" id="qs-topic" placeholder="主题（如：月相变化）" value="水的蒸发" />
+            </div>
+            <div class="form-row">
+              <input type="text" id="qs-goal" placeholder="教学目标（如：理解月相变化规律）" value="理解蒸发可以在常温下发生" />
+            </div>
+            <button type="submit" class="btn-generate">生成探究方案</button>
+          </form>
+          <p class="quickstart-example">示例：四年级 · 月相变化 · 探究课</p>
+        </div>
       </div>
-    </header>
+    </section>
 
-    <main class="layout">
-      <section class="panel">
-        <div class="panel-title">
-          <span>01</span>
-          <h2>探究活动生成</h2>
+    <!-- 功能模块 -->
+    <section class="features-section" id="features">
+      <div class="section-header">
+        <h2>三大核心功能</h2>
+        <p>覆盖备课全流程：设计 → 审核 → 评价</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>探究活动生成</h3>
+          <p>基于 2022 版课标，为指定年级和主题生成结构化探究活动方案，包含实验步骤、材料清单和安全评估。</p>
+          <div class="feature-scenarios">
+            <span class="scenario-tag">新课设计</span>
+            <span class="scenario-tag">实验探究</span>
+            <span class="scenario-tag">课堂活动设计</span>
+          </div>
         </div>
-
-        <label>
-          年级
-          <input id="grade" value="四年级" placeholder="例如：四年级" />
-        </label>
-
-        <label>
-          主题
-          <input id="topic" value="水的蒸发" placeholder="例如：水的蒸发" />
-        </label>
-
-        <label>
-          教学目标
-          <textarea id="goal" rows="3" placeholder="希望学生理解什么、会做什么">理解蒸发可以在常温下发生，并能设计公平比较实验。</textarea>
-        </label>
-
-        <div class="two-col">
-          <label>
-            课堂时间
-            <input id="duration" value="40分钟" />
-          </label>
-          <label>
-            材料限制
-            <input id="materials" value="普通教室材料，避免明火" />
-          </label>
+        <div class="feature-card">
+          <div class="feature-icon">✅</div>
+          <h3>科学内容审核</h3>
+          <p>自动核对课标要求，检测科学概念准确性，标记实验安全风险，提供修改建议和替代方案。</p>
+          <div class="feature-scenarios">
+            <span class="scenario-tag">检查科学错误</span>
+            <span class="scenario-tag">实验安全检查</span>
+            <span class="scenario-tag">概念准确性</span>
+          </div>
         </div>
-
-        <button id="generateBtn">生成探究方案</button>
-        <div id="inquiryResult" class="result">
-          <pre class="output">生成结果会显示在这里。</pre>
+        <div class="feature-card">
+          <div class="feature-icon">📚</div>
+          <h3>配套评价资源</h3>
+          <p>基于探究方案自动生成随堂练习、实验报告模板和评分量规，形成完整的教学评价闭环。</p>
+          <div class="feature-scenarios">
+            <span class="scenario-tag">课堂练习</span>
+            <span class="scenario-tag">实验报告</span>
+            <span class="scenario-tag">评价量规</span>
+          </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="panel">
-        <div class="panel-title">
-          <span>02</span>
-          <h2>科学内容审核</h2>
+    <!-- 知识库说明 -->
+    <section class="knowledge-section" id="knowledge">
+      <div class="section-header">
+        <h2>AI 科学知识引擎</h2>
+        <p>基于课程标准和科学知识库增强，确保生成内容准确可靠</p>
+      </div>
+      <div class="knowledge-grid">
+        <div class="knowledge-card">
+          <div class="knowledge-icon">📖</div>
+          <h3>课标对齐</h3>
+          <p>严格依据《义务教育科学课程标准（2022年版）》13 个学科核心概念生成内容</p>
         </div>
-
-        <label>
-          教师文本
-          <textarea id="auditText" rows="8" placeholder="粘贴一段教案、讲解词或实验说明">水只有烧开以后才会变成水蒸气，所以蒸发就是沸腾。</textarea>
-        </label>
-
-        <button id="auditBtn">审核科学内容</button>
-        <div id="auditResult" class="result">
-          <pre class="output">审核结果会显示在这里。</pre>
+        <div class="knowledge-card">
+          <div class="knowledge-icon">🔒</div>
+          <h3>安全评估</h3>
+          <p>自动识别实验安全风险，提供替代方案和教师提示，确保课堂安全</p>
         </div>
-      </section>
-    </main>
+        <div class="knowledge-card">
+          <div class="knowledge-icon">🎯</div>
+          <h3>年级匹配</h3>
+          <p>根据学生认知水平调整内容深度，确保适合相应年级教学</p>
+        </div>
+        <div class="knowledge-card">
+          <div class="knowledge-icon">📋</div>
+          <h3>可直接使用</h3>
+          <p>生成结果包含教学目标、活动设计、实验材料、评价方式，可直接进教案</p>
+        </div>
+      </div>
+    </section>
 
-    <script src="/app.js"></script>
+    <!-- 开始使用 -->
+    <section class="cta-section">
+      <div class="cta-inner">
+        <h2>开始使用 ScienceCopilot</h2>
+        <p>无需注册，打开即用。当前为测试版本，欢迎反馈使用体验。</p>
+        <a href="/app.html" class="btn-cta">进入 AI 实验室</a>
+      </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="teacher-footer">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span>ScienceCopilot</span>
+          <span class="footer-tag">测试版</span>
+        </div>
+        <div class="footer-links">
+          <a href="/app.html">工作台</a>
+          <a href="/intro.html">项目介绍</a>
+        </div>
+        <p class="footer-note">基于 LLM + Agent + RAG 技术构建 · 面向科学教师的真实需求设计</p>
+      </div>
+    </footer>
+
+    <script src="/landing.js"></script>
   </body>
 </html>

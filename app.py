@@ -29,9 +29,11 @@ PUBLIC = ROOT / "public"
 STATIC_ROUTES = {
     "/": ("text/html; charset=utf-8", "index.html"),
     "/index.html": ("text/html; charset=utf-8", "index.html"),
+    "/app.html": ("text/html; charset=utf-8", "app.html"),
     "/intro.html": ("text/html; charset=utf-8", "intro.html"),
     "/styles.css": ("text/css; charset=utf-8", "styles.css"),
     "/app.js": ("application/javascript; charset=utf-8", "app.js"),
+    "/landing.js": ("application/javascript; charset=utf-8", "landing.js"),
 }
 
 
@@ -96,6 +98,12 @@ class Handler(BaseHTTPRequestHandler):
             return
         if self.path == "/api/audit":
             self._handle_agent_sse("audit", data)
+            return
+        if self.path == "/api/companion":
+            self._handle_agent_sse("companion", data)
+            return
+        if self.path == "/api/diagnose":
+            self._handle_agent_sse("diagnose", data)
             return
         self._send_json({"error": "Not found"}, status=404)
 

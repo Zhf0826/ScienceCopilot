@@ -56,6 +56,8 @@ def check_safety(materials: str = "", plan_text: str = "") -> str:
     for h in hits:
         lines.append(f"[{level_label.get(h['level'], h['level'])}危] {h['label']}")
         lines.append(f"    建议：{h['advice']}")
+        if h.get("substitute"):
+            lines.append(f"    替代方案：{h['substitute']}")
     return "\n".join(lines)
 
 

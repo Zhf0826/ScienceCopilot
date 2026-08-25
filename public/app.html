@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>工作台 — ScienceCopilot</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="teacher-app-page">
+    <!-- 顶部导航 -->
+    <nav class="teacher-app-nav">
+      <div class="nav-inner">
+        <a href="/" class="app-logo">
+          <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="12" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+            <circle cx="14" cy="14" r="6" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+            <circle cx="14" cy="14" r="2" fill="currentColor"/>
+          </svg>
+          <span>ScienceCopilot</span>
+        </a>
+        <span class="nav-divider">/</span>
+        <span class="nav-current">工作台</span>
+        <div class="nav-right">
+          <span class="status-pill" id="engineStatus">
+            <span class="status-dot"></span>
+            <span class="status-text">检测中…</span>
+          </span>
+          <button class="nav-btn" id="openHistory">历史记录</button>
+          <a href="/" class="nav-btn">首页</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 工作台主体 -->
+    <main class="teacher-main">
+      <!-- 欢迎区（仅首次显示） -->
+      <header class="work-welcome" id="workWelcome">
+        <h1>欢迎来到 ScienceCopilot 工作台</h1>
+        <p>选择一个工具开始备课，或从历史记录中恢复之前的工作</p>
+      </header>
+
+      <!-- 工具选择区 -->
+      <section class="tools-section" id="toolsSection">
+        <div class="tools-grid">
+          <div class="tool-card" data-mode="inquiry">
+            <div class="tool-icon">🔍</div>
+            <h3>探究活动生成</h3>
+            <p class="tool-desc">基于课标自动生成结构化探究方案</p>
+            <div class="tool-scenarios">
+              <span>新课设计</span>
+              <span>实验探究</span>
+              <span>课堂活动</span>
+            </div>
+            <button class="tool-btn">开始生成 →</button>
+          </div>
+          <div class="tool-card" data-mode="audit">
+            <div class="tool-icon">✅</div>
+            <h3>科学内容审核</h3>
+            <p class="tool-desc">核对课标、检测概念准确性、评估安全风险</p>
+            <div class="tool-scenarios">
+              <span>检查科学错误</span>
+              <span>实验安全</span>
+              <span>概念准确性</span>
+            </div>
+            <button class="tool-btn">开始审核 →</button>
+          </div>
+          <div class="tool-card" data-mode="companion">
+            <div class="tool-icon">📚</div>
+            <h3>配套评价资源</h3>
+            <p class="tool-desc">生成随堂练习、实验报告模板与评分量规</p>
+            <div class="tool-scenarios">
+              <span>课堂练习</span>
+              <span>实验报告</span>
+              <span>评价量规</span>
+            </div>
+            <button class="tool-btn">开始生成 →</button>
+          </div>
+          <div class="tool-card" data-mode="diagnose">
+            <div class="tool-icon">🎯</div>
+            <h3>迷思概念诊断</h3>
+            <p class="tool-desc">将学生常见错误转化为诊断题与教学建议</p>
+            <div class="tool-scenarios">
+              <span>错题分析</span>
+              <span>认知诊断</span>
+              <span>教学建议</span>
+            </div>
+            <button class="tool-btn">开始诊断 →</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 工作区 -->
+      <section class="workspace-section" id="workspaceSection"></section>
+    </main>
+
+    <!-- 历史记录抽屉 -->
+    <div class="overlay" id="overlay"></div>
+    <aside class="history-drawer" id="historyDrawer">
+      <div class="history-head">
+        <h2>历史记录</h2>
+        <div class="history-actions">
+          <button class="ghost-btn" id="clearHistory">清空</button>
+          <button class="ghost-btn" id="closeHistory">关闭</button>
+        </div>
+      </div>
+      <p class="history-tip">记录保存在本机浏览器，不会上传。可点击恢复、删除。</p>
+      <div id="historyList" class="history-list"></div>
+    </aside>
+
+    <!-- 反馈浮窗 -->
+    <div class="feedback-widget" id="feedbackWidget">
+      <button class="feedback-toggle" id="feedbackToggle">💬 反馈</button>
+      <div class="feedback-panel" id="feedbackPanel">
+        <h4>这个结果有帮助吗？</h4>
+        <div class="feedback-options">
+          <button class="feedback-btn" data-rating="helpful">👍 有帮助</button>
+          <button class="feedback-btn" data-rating="needs-fix">⚠️ 需要修改</button>
+          <button class="feedback-btn" data-rating="not-fit">❌ 不符合需求</button>
+        </div>
+        <textarea class="feedback-text" id="feedbackText" placeholder="补充说明（可选）：例如希望增加什么内容、哪里不符合教学需求…" rows="3"></textarea>
+        <div class="feedback-actions">
+          <button class="feedback-submit" id="feedbackSubmit">提交反馈</button>
+          <button class="feedback-cancel" id="feedbackCancel">取消</button>
+        </div>
+        <p class="feedback-note">您的反馈将帮助我们改进产品</p>
+      </div>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

@@ -31,6 +31,12 @@ class TestRag(unittest.TestCase):
         hits = rag.check_safety("普通教室材料，避免明火")
         self.assertFalse(any(h["label"] == "明火 / 高温" for h in hits))
 
+    def test_check_safety_returns_substitute(self):
+        hits = rag.check_safety("使用 220V 市电插座做学生实验")
+        self.assertTrue(any(h["label"] == "用电安全" for h in hits))
+        electric = [h for h in hits if h["label"] == "用电安全"][0]
+        self.assertTrue(electric["substitute"], "安全规则应带替代方案")
+
 
 if __name__ == "__main__":
     unittest.main()

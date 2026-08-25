@@ -41,6 +41,29 @@ class TestAgent(unittest.TestCase):
         self.assertIn("蒸发", res["result"])
         self.assertTrue(res["trace"])
 
+    def test_companion_demo(self):
+        res = agent.run(
+            "companion",
+            {"grade": "四年级", "topic": "水的蒸发", "goal": "理解蒸发"},
+        )
+        self.assertTrue(res["demo"])
+        self.assertIn("随堂练习", res["result"])
+        self.assertIn("评分量规", res["result"])
+        self.assertTrue(any(a["tool"] == "retrieve_curriculum" for a in res["trace"] if a["type"] == "action"))
+
+    def test_diagnose_demo(self):
+        res = agent.run(
+            "diagnose",
+            {"grade": "四年级", "topic": "水的蒸发", "errors": "学生说水只有烧开才变水蒸气"},
+        )
+        self.assertTrue(res["demo"])
+        self.assertIn("诊断题", res["result"])
+        self.assertIn("课标依据", res["result"])
+
+    def test_unknown_task_raises(self):
+        with self.assertRaises(ValueError):
+            agent.run("nope", {})
+
 
 class TestAgentRealToolCalls(unittest.TestCase):
     """验证真实 function calling 分支构造的回传消息满足 OpenAI/豆包规范：

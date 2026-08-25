@@ -8,9 +8,12 @@
   </head>
   <body>
     <header class="topbar">
-      <div>
-        <h1>ScienceCopilot</h1>
-        <p>小学科学教师智能助手 · <span class="tag">LLM · Prompt · Agent · RAG</span></p>
+      <div class="brand">
+        <span class="brand-mark">🔬</span>
+        <div class="brand-text">
+          <h1>ScienceCopilot</h1>
+          <p>小学科学教师智能助手 · <span class="tag">LLM · Prompt · Agent · RAG</span></p>
+        </div>
       </div>
       <div class="topbar-right">
         <a class="intro-link" href="/index.html">← 返回应用</a>
@@ -18,6 +21,16 @@
     </header>
 
     <article class="intro">
+      <section class="hero">
+        <h2>让备课有依据，让探究更安全</h2>
+        <p class="lead">
+          ScienceCopilot 是为小学科学教师打造的 AI 备课协作者——自动对齐
+          《2022 年版课标》、评估实验安全、诊断学生迷思概念，把三件高门槛的
+          备课工作前置到生成与审核环节。
+        </p>
+        <a class="hero-cta" href="/index.html">打开工作台 →</a>
+      </section>
+
       <p class="lead">
         ScienceCopilot 把"小学科学备课"这件重复性高、专业门槛不低的工作，
         交给一个会规划、会查课标、能评估实验安全的 AI Agent。它不是一个只会
@@ -72,6 +85,19 @@
         适用年级与命中关键词。后续可无缝替换为向量检索，对外接口不变。
       </p>
 
+      <h2>面向教师的增强能力（差异化壁垒）</h2>
+      <p>
+        与"直接丢给通用 AI"相比，ScienceCopilot 把教师备课的几个痛点做成了开箱即用的能力：
+      </p>
+      <ul>
+        <li><strong>📘 课标依据卡片</strong>：结果页直接渲染《义务教育科学课程标准（2022年版）》的核心概念、跨学科概念与具体引文——通用 AI 给不出可标注的课标出处，教研组长与家长问起来老师答得上来。</li>
+        <li><strong>🛡️ 安全预案</strong>：实验安全检查命中风险后，不只红色告警，还给出可落地的<strong>替代方案</strong>（如"市电 → 低压电池盒"），教师真正敢用。</li>
+        <li><strong>✏️ 改一改</strong>：结果下方写一句修改意见即可在上一版基础上迭代，贴合教师真实改稿习惯。</li>
+        <li><strong>⬇️ 导出 / 🖨️ 打印</strong>：一键导出 Markdown 或打印，带去教室、交教研都方便。</li>
+        <li><strong>🕘 历史记录</strong>：每次结果存于本机浏览器，可恢复、删除，形成个人教案资产。</li>
+        <li><strong>04 迷思概念诊断</strong>：把班级高频错误 / 学生原话转成诊断题与教学建议，直接对接"错题册"闭环。</li>
+      </ul>
+
       <h2>技术栈与工程取舍</h2>
       <ul>
         <li><strong>零依赖</strong>：仅用 Python 标准库，<code>python app.py</code> 即可启动。</li>
@@ -87,18 +113,19 @@
         接入真实模型（DeepSeek）：<code>$env:DEEPSEEK_API_KEY="你的 Key"</code> 后再运行。
       </p>
 
-      <h2>面试讲解要点</h2>
+      <h2>为什么选择 ScienceCopilot</h2>
       <ul>
-        <li>"为什么是 Agent 而不是单次补全？"——因为备课需要查证与多步推理。</li>
-        <li>"RAG 为什么用稀疏检索？"——离线、透明、零依赖，且接口可平滑升级到向量。</li>
-        <li>"演示模式有何意义？"——让评审无需密钥即可完整体验系统，降低上手门槛。</li>
-        <li>"如何保证质量？"——固定输出格式 + 工具证据 + 可扩展的 LLM-as-judge 评测。</li>
+        <li><strong>备课即审课</strong>：每份方案在生成时自动核对课标、评估安全，教师拿到的不只是文本，而是经过校验的教学设计。</li>
+        <li><strong>出处透明</strong>：课标依据、安全提示、检索来源全部可见，教研检查或家长询问时都能说清依据。</li>
+        <li><strong>零门槛上手</strong>：没有 API Key 也能进入演示模式完整体验，看懂产品价值后再决定是否接入模型。</li>
+        <li><strong>结果可带走</strong>：支持导出 Markdown 与打印，生成的方案能直接进教案、进课堂、进教研材料。</li>
       </ul>
 
-      <h2>路线规划</h2>
+      <h2>产品路线</h2>
       <p>
-        MVP 加固 → 单 Agent（规划 + 工具 + 反思）→ 多 Agent 协作（设计/审核/安全三 Agent）
-        + 向量 RAG + 记忆层 → 评测集与 Trace 面板 + 一键部署。
+        当前已覆盖探究活动生成、内容审核、配套资源、迷思诊断四大备课场景。下一步将
+        接入向量知识库实现更精准检索，支持多人协作备课与校本教案积累，并加入质量评测
+        与使用反馈闭环，让 ScienceCopilot 成为教师日常备课的默认工作台。
       </p>
 
       <a class="back" href="/index.html">← 回到应用，亲自试一试</a>

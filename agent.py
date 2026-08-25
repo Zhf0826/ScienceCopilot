@@ -21,8 +21,12 @@ import rag
 import tools
 from prompts import (
     AUDIT_SYSTEM,
+    COMPANION_SYSTEM,
+    DIAGNOSE_SYSTEM,
     INQUIRY_SYSTEM,
     build_audit_user_prompt,
+    build_companion_user_prompt,
+    build_diagnose_user_prompt,
     build_inquiry_user_prompt,
 )
 
@@ -38,6 +42,16 @@ def run(task: str, data: dict) -> dict:
         user = build_audit_user_prompt(data)
         query = data.get("content", "")
         text = data.get("content", "")
+    elif task == "companion":
+        system = COMPANION_SYSTEM
+        user = build_companion_user_prompt(data)
+        query = f"{data.get('grade','')} {data.get('topic','')} {data.get('goal','')} {data.get('plan','')}"
+        text = f"{data.get('plan','')} {data.get('errors','')}"
+    elif task == "diagnose":
+        system = DIAGNOSE_SYSTEM
+        user = build_diagnose_user_prompt(data)
+        query = f"{data.get('grade','')} {data.get('topic','')} {data.get('errors','')}"
+        text = data.get("errors", "") or data.get("content", "")
     else:
         raise ValueError(f"未知任务类型：{task}")
 
@@ -144,8 +158,12 @@ def _run_demo(task: str, data: dict, query: str, text: str) -> dict:
 
     if task == "inquiry":
         result = _demo_inquiry(data, retrieved, safety)
-    else:
+    elif task == "audit":
         result = _demo_audit(data, retrieved, safety)
+    elif task == "companion":
+        result = _demo_companion(data, retrieved, safety)
+    else:
+        result = _demo_diagnose(data, retrieved, safety)
 
     trace.append({"type": "final", "text": result})
     return {
@@ -275,3 +293,91 @@ def _demo_audit(data: dict, retrieved: list[dict], safety: list[dict]) -> str:
 引导学生先预测再验证，而不是直接给出结论。
 
 提示：当前未配置 API Key，以上为本地演示审核结果。"""
+
+
+def _demo_companion(data: dict, retrieved: list[dict], safety: list[dict]) -> str:
+    topic = data.get("topic", "本主题").strip() or "本主题"
+    grade = data.get("grade", "").strip() or "对应年级"
+    top = retrieved[0] if retrieved else None
+    ref = top["standard_ref"] if top else "通用科学常识（未检索到对应课标条目）"
+    misconception = (
+        "；".join(top["misconceptions"]) if top else "结合课堂观察补充本班典型误区。"
+    )
+
+    safety_note = ""
+    if safety:
+        level_label = {"high": "高", "medium": "中", "low": "低"}
+        joined = "；".join(
+            f"[{level_label.get(s['level'])}危]{s['label']}：{s['advice']}" for s in safety
+        )
+        safety_note = f"\n\n【安全提示】\n{joined}"
+    else:
+        safety_note = "\n\n【安全提示】\n本方案使用普通教室材料，风险较低；仍建议教师现场评估。"
+
+    return f"""【资源概述】
+为"{topic}"（{grade}）配套的课堂评价资源，覆盖随堂练习、实验报告与评分量规，
+可帮助教师把"生成—上课—评价"串成闭环。
+
+【随堂练习】
+1.（记忆）请说出水从液态变成气态的两种方式，并各举一例。
+   答案要点：蒸发（常温表面缓慢汽化）、沸腾（达到沸点时剧烈汽化）。
+2.（理解）为什么湿衣服在通风处比在密闭衣柜里干得更快？
+   答案要点：通风加快空气流动，加速衣服表面水分蒸发。
+3.（应用）设计一个公平小实验，比较"温度"对蒸发快慢的影响，写出变量与控制条件。
+   答案要点：只改变温度（如阳光下 vs 阴凉处），其余条件（水量、容器、通风）相同。
+
+【实验报告模板】
+研究问题：________________
+材料：________________
+步骤：________________
+观察记录：________________
+结论：________________
+
+【评分量规】
+优秀：能完整描述三态变化，独立设计公平实验并合理解释；
+良好：能说出蒸发与沸腾的区别，实验设计基本合理；
+合格：能识别水的三态，但解释不够完整或实验有疏漏。
+
+【课标依据】
+依据《义务教育科学课程标准（2022年版）》：{ref}
+
+提示：当前未配置 API Key，以上为基于课标库的本地演示结果；配置密钥后将由模型
+生成更贴合你输入的方案。常见误区参考：{misconception}{safety_note}"""
+
+
+def _demo_diagnose(data: dict, retrieved: list[dict], safety: list[dict]) -> str:
+    topic = data.get("topic", "本主题").strip() or "本主题"
+    grade = data.get("grade", "").strip() or "对应年级"
+    errors = data.get("errors", "").strip() or "（未提供，依据课标常见误区生成）"
+    top = retrieved[0] if retrieved else None
+    ref = top["standard_ref"] if top else "通用科学常识（未检索到对应课标条目）"
+    misconception = (
+        "；".join(top["misconceptions"]) if top else "结合课堂观察补充本班典型误区。"
+    )
+
+    return f"""【诊断目标】
+针对"{topic}"（{grade}），检测学生是否真正理解而非凭直觉作答。
+教师提供的高频错误 / 学生原话：{errors}
+
+【诊断题】
+1. 判断题：水只有被烧开（沸腾）之后，才会变成水蒸气。对 / 错？为什么？
+   参考答案：错。蒸发在常温下也能发生，沸腾是达到沸点时的剧烈汽化。
+   对应迷思概念：把"蒸发"与"沸腾"混为一谈，以为水只有烧开才变水蒸气。
+2. 选择题：湿衣服晾在通风向阳处干得更快，主要原因是（ ）。
+   A. 太阳把水"吃掉"  B. 温度高、空气流动快，加速蒸发  C. 衣服自己变干
+   参考答案：B。
+   对应迷思概念：对"蒸发"的微观过程缺乏理解，常用拟人化错误解释。
+3. 开放题：请设计一句话或一个现象，向同学证明"看不见的水蒸气确实存在"。
+   参考答案：对比两杯等量水，几天后敞口杯水量明显减少——水变成了看不见的水蒸气。
+   对应迷思概念：认为"看不见就是不存在"。
+
+【解析与教学建议】
+学生易把宏观现象归因于拟人化原因（如"太阳吃掉""风拿走"）。教学时应多用
+可观测证据（水量减少、镜片起雾）建立"物质不灭、只是状态变化"的观念，并在
+实验后用"改一改"让学生重写自己的错误解释。
+
+【课标依据】
+依据《义务教育科学课程标准（2022年版）》：{ref}
+
+提示：当前未配置 API Key，以上为基于课标库的本地演示结果；配置密钥后将由模型
+生成更贴合你输入的方案。常见误区参考：{misconception}"""
