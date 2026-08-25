@@ -11,11 +11,10 @@
 | 文件 | 作用 |
 |---|---|
 | `requirements.txt` | 声明零第三方依赖（仅标准库），满足云平台构建约定 |
-| `config.py`（已改） | `HOST` 默认 `0.0.0.0`、`PORT` 读取环境变量，可被外部访问 |
+| `config.py` | `HOST` 默认 `0.0.0.0`、`PORT` 读取环境变量，可被外部访问 |
 | `render.yaml` | Render 一键部署配置（**首推方案**） |
-| `Dockerfile` | 通用 Docker 镜像（供 Railway / 任意 Docker 主机） |
-| `runtime.txt` | 指定 Python 版本（Render 构建用，可改 3.13） |
-| `.gitignore` | 排除 `.env`、`.workbuddy/`、缓存等，避免泄露与冗余 |
+| `runtime.txt` | 指定 Python 版本（Render 构建用） |
+| `.gitignore` | 排除 `.env`、`.workbuddy/`、`backup/`、`research/`、缓存等 |
 
 ---
 
@@ -24,38 +23,34 @@
 Render 免费 Web Service 无需绑卡，最适合本项目。部署后地址形如：
 `https://sciencecopilot-xxx.onrender.com`
 
-### 步骤 1：本地提交到 Git（本仓库已完成初始化与初始提交）
-```powershell
-cd "D:\学习\AI项目\ScienceCopilot"
-git status            # 确认 .env / .workbuddy / __pycache__ 已被忽略
-git add -A
-git commit -m "chore: add cloud deployment files (Render/Railway/Docker)"
-```
+### 前置条件
+代码已推送到 GitHub 仓库：
+- 仓库地址：`https://github.com/Zhf0826/ScienceCopilot`
+- 当前最新提交：`71d8715`（教师测试版 UI）
 
-### 步骤 2：推送到 GitHub
-1. 浏览器打开 https://github.com → **New repository** → 名称填 `ScienceCopilot`（Public）→ 不勾选 README/.gitignore（本地已有）→ Create。
-2. 复制仓库地址（HTTPS），本地关联并推送：
-```powershell
-git remote add origin https://github.com/<你的用户名>/ScienceCopilot.git
-git branch -M main
-git push -u origin main
-```
-
-### 步骤 3：在 Render 创建 Web Service
+### 步骤 1：在 Render 创建 Web Service
 1. 打开 https://render.com → 注册/登录（可用 GitHub 账号授权）。
-2. 右上角 **New +** → **Web Service** → 选择刚才的 GitHub 仓库 `ScienceCopilot`。
+2. 右上角 **New +** → **Web Service** → 选择 GitHub 仓库 `ScienceCopilot`。
 3. 部署方式选 **"Use the render.yaml in this repo"**（仓库里已提供，自动填好构建/启动命令与端口）。
-   - 若手动填写：`Runtime = Python`，`Build Command` 留空或填 `pip install -r requirements.txt`，`Start Command = python app.py`，`Instance Type = Free`。
+   - 若手动填写：`Runtime = Python`，`Build Command` 留空，`Start Command = python app.py`，`Instance Type = Free`。
 4. 点击 **Create Web Service**。
 
-### 步骤 4：获取公网 URL
-部署约 1–2 分钟。完成后 Render 会给出形如 `https://sciencecopilot.onrender.com` 的 URL（子域名 `sciencecopilot` 即 `render.yaml` 里的 `name`，被占用时可改）。
+### 步骤 2：获取公网 URL
+部署约 1–2 分钟。完成后 Render 会给出形如 `https://sciencecopilot.onrender.com` 的 URL。
 
 > 免费实例在**无流量约 15 分钟后会自动休眠**，首次访问需等待约 30–50 秒冷启动，属正常现象。
 
+### 步骤 3：验证部署
+```powershell
+$base = "https://你的地址.onrender.com"
+curl "$base/api/status"
+curl -X POST "$base/api/inquiry" -H "Content-Type: application/json" `
+  -d '{"grade":"四年级","topic":"水的蒸发","goal":"理解蒸发","duration":"40分钟","materials":"普通教室材料"}'
+```
+
 ---
 
-## 三、备选方案 1：Railway（免费额度，需绑卡验证）
+## 三、备选方案：Railway（免费额度，需绑卡验证）
 
 1. https://railway.app → 用 GitHub 登录 → **New Project** → **Deploy from GitHub repo**。
 2. 选 `ScienceCopilot` 仓库 → 变量可不填（默认演示模式）。
@@ -66,48 +61,26 @@ git push -u origin main
 
 ---
 
-## 四、备选方案 2：任意 Docker 主机（Fly.io / 云服务器 / 本地）
+## 四、部署后自检清单
 
-本仓库已含 `Dockerfile`，可直接构建镜像：
-```bash
-docker build -t sciencecopilot .
-docker run -d -p 8000:8000 --name scp sciencecopilot
-# 访问 http://<主机IP>:8000
-```
-云平台（如 Fly.io）提供 `fly launch` 自动读取 Dockerfile 并分配公网域名。
-
----
-
-## 五、部署后自检清单
-
-部署完成后，在浏览器/命令行逐项确认：
-
-- [ ] **首页能打开**：访问根地址 `/`，应显示「小学科学探究助手」页面。
-- [ ] **API 正常**：`POST /api/inquiry` 与 `POST /api/audit` 返回 JSON，含 `trace / retrieved / safety / result / demo` 字段。
-- [ ] **静态文件正常**：`/styles.css`、`/app.js`、`/intro.html` 均可加载（页面样式与脚本不报错）。
-- [ ] **知识库正常加载**：返回结果中的 `retrieved` 包含课标片段，`safety` 含安全提示，说明 `kb/*.json` 被正确读取。
+- [ ] **首页能打开**：访问根地址 `/`，应显示教师欢迎页（ScienceCopilot Landing Page）。
+- [ ] **工作台能打开**：访问 `/app.html`，应显示 AI 实验室工作台。
+- [ ] **API 正常**：`POST /api/inquiry`、`/api/audit`、`/api/companion`、`/api/diagnose` 返回 SSE 流，`done` 事件包含完整结果。
+- [ ] **静态文件正常**：`/styles.css`、`/app.js`、`/landing.js`、`/app.html` 均可加载。
 - [ ] **演示模式运行**：`GET /api/status` 返回 `"demo": true`，未配置密钥时也能完整使用。
 
-快速验证（本地或服务器均可）：
-```powershell
-$base = "https://你的地址.onrender.com"
-curl "$base/api/status"
-curl -X POST "$base/api/inquiry" -H "Content-Type: application/json" `
-  -d '{"grade":"四年级","topic":"水的蒸发","goal":"理解蒸发","duration":"40分钟","materials":"普通教室材料"}'
-```
-
 ---
 
-## 六、注意事项
+## 五、注意事项
 
 - **自定义域名（可选）**：Render / Railway 付费档支持绑定自己的域名；免费档用平台子域名即可。
-- **接入真实模型（可选）**：在平台的环境变量中添加 `DEEPSEEK_API_KEY`（或 `OPENAI_API_KEY`），重启后自动切换为真实 LLM 生成，且仍走 Agent + RAG 工作流。
+- **接入真实模型（可选）**：在平台的环境变量中添加 `DEEPSEEK_API_KEY`（或 `OPENAI_API_KEY` / `OPENAI_BASE_URL` / `OPENAI_MODEL`），重启后自动切换为真实 LLM 生成。
 - **安全**：仓库已 `.gitignore` `.env`，**切勿把真实密钥提交进 Git**。密钥只放在云平台的环境变量里。
 - **休眠**：免费实例会休眠，演示足够；若要常驻，升级付费档或设置定时唤醒。
 
 ---
 
-## 七、常见问题
+## 六、常见问题
 
 **Q：部署后首页打不开 / 健康检查失败？**
 A：确认 `Start Command` 为 `python app.py`，且 `config.py` 的 `HOST=0.0.0.0`（已默认）。Render 健康检查访问 `/`，本应用已返回 200。
